@@ -64,7 +64,7 @@ impl WordleWords {
         };
 
         let date_str = format!("{}-{}-{}", chrono::Local::now().date_naive().year(), month, day);
-        let nyt_wordlist_url = format!("https://www.nytimes.com/svc/wordle/v2/{}.json", date_str);
+        let nyt_wordlist_url = format!("https://www.nytimes.com/svc/wordle/v2/{}.json", "2023-05-21");//date_str);
 
         let word_req = reqwest::blocking::get(nyt_wordlist_url);
         
@@ -84,7 +84,7 @@ impl WordleWords {
     }
 
     fn get_wordlist() -> Vec<String> {
-        let raw_wordlist = include_str!("wordlist.json");
+        let raw_wordlist = include_str!("assets/wordlist.json");
 
         let wordlist: WordList = serde_json::from_str(raw_wordlist).unwrap();
 
