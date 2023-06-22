@@ -37,13 +37,22 @@ or, for a random "offline" Wordle solution:
 ### Examples
 
 ![correct_letter](docs/images/correct_letter.png)
+
 **C** is in the word and is in the correct spot.
 
+<br>
+
 ![misplaced_letter](docs/images/misplaced_letter.png)
+
 **R** is in the word but in the wrong spot.
 
+<br>
+
 ![incorrect_letter](docs/images//incorrect_letter.png)
+
 None of these letters are in the word.
+
+<br>
 
 ### Gameplay
 
