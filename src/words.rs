@@ -64,7 +64,7 @@ impl WordleWords {
         };
 
         let date_str = format!("{}-{}-{}", chrono::Local::now().date_naive().year(), month, day);
-        let nyt_wordlist_url = format!("https://www.nytimes.com/svc/wordle/v2/{}.json", "2023-05-21");//date_str);
+        let nyt_wordlist_url = format!("https://www.nytimes.com/svc/wordle/v2/{}.json", date_str);
 
         let word_req = reqwest::blocking::get(nyt_wordlist_url);
         
