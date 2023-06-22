@@ -28,6 +28,7 @@ or, for a random "offline" Wordle solution:
 ./target/release/rustle --offline
 ```
 
+
 ## How to Play
 
 - All guesses must be five letters long
@@ -37,23 +38,14 @@ or, for a random "offline" Wordle solution:
 ### Examples
 
 ![correct_letter](docs/images/correct_letter.png)
-
-**C** is in the word and is in the correct spot.
-
-<br>
+<br>**C** is in the word and is in the correct spot.
 
 ![misplaced_letter](docs/images/misplaced_letter.png)
-
-**R** is in the word but in the wrong spot.
-
-<br>
+<br>**R** is in the word but in the wrong spot.
 
 ![incorrect_letter](docs/images//incorrect_letter.png)
-
-None of these letters are in the word.
-
-<br>
+<br>None of these letters are in the word.
 
 ### Gameplay
 
-![rustle_play](docs/images/rustle_win.gif)
+<img src="docs/images/rustle_win.gif" height="480">
