@@ -48,4 +48,4 @@ or, for a random "offline" Wordle solution:
 
 ### Gameplay
 
-<img src="docs/images/rustle_win.gif" height="480">
+<img src="docs/images/rustle_win.gif" width="50%">

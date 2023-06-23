@@ -1,4 +1,4 @@
-use std::io;
+use std::{io, fmt::format};
 use std::io::Write;
 use std::boxed::Box;
 use crossterm::{QueueableCommand, ExecutableCommand, cursor, terminal};
@@ -11,24 +11,36 @@ pub enum TermFormatter {
     GrayBg,
     GreenFg,
     RedFg,
+    BlackFg,
     Clear,
-    Bold,
+    DefaultBold,
+    BlackBold,
+    GreenBold,
+    RedBold,
     SlowBlink
 }
 
 impl TermFormatter {
-    pub fn as_str(&self) -> &'static str {
+    pub fn as_str(&self) -> String {
         match self {
-            TermFormatter::GreenBg => "\x1b[30;102m",
-            TermFormatter::YellowBg => "\x1b[30;103m",
-            TermFormatter::WhiteBg => "\x1b[47m",
-            TermFormatter::GrayBg => "\x1b[30;100m",
-            TermFormatter::GreenFg => "\x1b[92m",
-            TermFormatter::RedFg => "\x1b[31m",
-            TermFormatter::Bold => "\x1b[1m",
-            TermFormatter::Clear => "\x1b[0m",
-            TermFormatter::SlowBlink => "\x1b[5m"
+            TermFormatter::GreenBg => String::from("\x1b[102m"),
+            TermFormatter::YellowBg => String::from("\x1b[103m"),
+            TermFormatter::WhiteBg => String::from("\x1b[47m"),
+            TermFormatter::GrayBg => String::from("\x1b[100m"),
+            TermFormatter::GreenFg => String::from("\x1b[92m"),
+            TermFormatter::BlackFg => String::from("\x1b[30m"),
+            TermFormatter::RedFg => String::from("\x1b[31m"),
+            TermFormatter::DefaultBold => String::from("\x1b[1m"),
+            TermFormatter::BlackBold => TermFormatter::get_bold(&TermFormatter::BlackFg).to_owned(),
+            TermFormatter::GreenBold => TermFormatter::get_bold(&TermFormatter::GreenFg).to_owned(),
+            TermFormatter::RedBold => TermFormatter::get_bold(&TermFormatter::RedFg).to_owned(),
+            TermFormatter::Clear => String::from("\x1b[0m"),
+            TermFormatter::SlowBlink => String::from("\x1b[5m")
         }
+    }
+    // This is neccesary as it appears Windows CLIs cannot handle stacked ANSI. ie. \x1b[1;30m would just be black
+    fn get_bold<'a>(color: &'a TermFormatter) -> String {
+        format!("{}{}", TermFormatter::DefaultBold.as_str(), color.as_str())
     }
 }
 
@@ -48,7 +60,7 @@ impl Logo {
   888ooo88P'  '888  '888  d88(  \"8  '888'   888  d88' '88b 
   888`^\\888b   888   888  `\"Y88b.    888    888  888ooo888 
  .888.  `888.  888   888. o.  )88b   888.  .888. 888. .ooo 
- o888o   888o  `V88V\"V888 8\"\"888P'   8888  88888 `Y88888P'\n";
+ o888o   888o  `V88V\"V888 8\"\"888P'   8888  88888  `Y88888P'\n";
 
         if offline {
             let mut spacer = String::new();
@@ -59,7 +71,7 @@ impl Logo {
                 &spacer,
                 TermFormatter::GreenFg.as_str(),
                 TermFormatter::SlowBlink.as_str(),
-                TermFormatter::Bold.as_str(), 
+                TermFormatter::DefaultBold.as_str(), 
                 &OFFLINE_STR, 
                 TermFormatter::Clear.as_str()
             ).to_owned();
@@ -106,7 +118,7 @@ impl RustleDisplay {
 
     pub fn draw_logo(&mut self) {
         self.stdout.queue(cursor::MoveUp(u16::from(self.overall_height))).unwrap();
-        self.stdout.write_all(format!("{}{}{}", TermFormatter::Bold.as_str(), Logo::get_logo(self.offline), TermFormatter::Clear.as_str()).as_bytes()).unwrap();
+        self.stdout.write_all(format!("{}{}{}", TermFormatter::DefaultBold.as_str(), Logo::get_logo(self.offline), TermFormatter::Clear.as_str()).as_bytes()).unwrap();
         self.stdout.queue(cursor::MoveDown(u16::from(self.game_height))).unwrap();
         self.stdout.flush().unwrap();
     }
@@ -120,7 +132,7 @@ impl RustleDisplay {
                 self.stdout.write_all(" ".as_bytes()).unwrap();
             }
             for letter in guess {
-                self.stdout.write_all(format!("{}{} {} {} ", TermFormatter::Bold.as_str(), letter.get_ansi_color(), letter.value, TermFormatter::Clear.as_str()).as_bytes()).unwrap();
+                self.stdout.write_all(format!("{}{} {} {} ", TermFormatter::BlackBold.as_str(), letter.get_ansi_color(), letter.value, TermFormatter::Clear.as_str()).as_bytes()).unwrap();
             }
             self.stdout.write_all("\n\n".as_bytes()).unwrap();
         }

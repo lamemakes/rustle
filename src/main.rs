@@ -21,7 +21,7 @@ pub struct Letter {
 }
 
 impl Letter {
-    pub fn get_ansi_color(&self) -> &'static str{
+    pub fn get_ansi_color(&self) -> String{
         match self.status {
             LetterState::Correct => TermFormatter::GreenBg.as_str(),
             LetterState::Exists => TermFormatter::YellowBg.as_str(),
@@ -110,11 +110,10 @@ fn main() {
         rustle_display.draw_ui(&guess_list);
 
         if guess == wordle_solution {
-            println!("{}{}WINNER!{} Word was \"{}{}{}\"", 
-            TermFormatter::GreenFg.as_str(),
-            TermFormatter::Bold.as_str(),
+            println!("{}WINNER!{} Word was \"{}{}{}\"", 
+            TermFormatter::GreenBold.as_str(),
             TermFormatter::Clear.as_str(),
-            TermFormatter::Bold.as_str(),
+            TermFormatter::DefaultBold.as_str(),
             wordle_solution.to_uppercase(),
             TermFormatter::Clear.as_str()
             

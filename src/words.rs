@@ -33,9 +33,8 @@ impl WordleWords {
                 Ok(sol) => sol,
                 Err(err) => {
                     println!(
-                        "{}{}{} A random solution will be used.{}",
-                        TermFormatter::Bold.as_str(),
-                        TermFormatter::RedFg.as_str(),
+                        "{}{} A random solution will be used.{}",
+                        TermFormatter::RedBold.as_str(),
                         err,
                         TermFormatter::Clear.as_str()
                     );
