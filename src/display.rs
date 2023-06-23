@@ -1,4 +1,4 @@
-use std::{io, fmt::format};
+use std::io;
 use std::io::Write;
 use std::boxed::Box;
 use crossterm::{QueueableCommand, ExecutableCommand, cursor, terminal};
@@ -38,9 +38,14 @@ impl TermFormatter {
             TermFormatter::SlowBlink => String::from("\x1b[5m")
         }
     }
-    // This is neccesary as it appears Windows CLIs cannot handle stacked ANSI. ie. \x1b[1;30m would just be black
+    // This is neccesary as it appears Windows CLIs don't like color & bold stacked.
     fn get_bold<'a>(color: &'a TermFormatter) -> String {
-        format!("{}{}", color.as_str(), TermFormatter::DefaultBold.as_str())
+        let os = std::env::consts::OS;
+        if os == "linux" || os == "macos" {
+            format!("{}{}", color.as_str(), TermFormatter::DefaultBold.as_str())
+        } else {
+            color.as_str()
+        }
     }
 }
 
