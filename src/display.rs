@@ -27,9 +27,9 @@ impl TermFormatter {
             TermFormatter::YellowBg => String::from("\x1b[103m"),
             TermFormatter::WhiteBg => String::from("\x1b[47m"),
             TermFormatter::GrayBg => String::from("\x1b[100m"),
-            TermFormatter::GreenFg => String::from("\x1b[92m"),
-            TermFormatter::BlackFg => String::from("\x1b[30m"),
-            TermFormatter::RedFg => String::from("\x1b[31m"),
+            TermFormatter::GreenFg => String::from("\x1b[0;92m"),
+            TermFormatter::BlackFg => String::from("\x1b[0;30m"),
+            TermFormatter::RedFg => String::from("\x1b[0;31m"),
             TermFormatter::DefaultBold => String::from("\x1b[1m"),
             TermFormatter::BlackBold => TermFormatter::get_bold(&TermFormatter::BlackFg).to_owned(),
             TermFormatter::GreenBold => TermFormatter::get_bold(&TermFormatter::GreenFg).to_owned(),
@@ -40,7 +40,7 @@ impl TermFormatter {
     }
     // This is neccesary as it appears Windows CLIs cannot handle stacked ANSI. ie. \x1b[1;30m would just be black
     fn get_bold<'a>(color: &'a TermFormatter) -> String {
-        format!("{}{}", TermFormatter::DefaultBold.as_str(), color.as_str())
+        format!("{}{}", color.as_str(), TermFormatter::DefaultBold.as_str())
     }
 }
 
