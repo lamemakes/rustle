@@ -17,10 +17,12 @@ git clone git@github.com:lamemakes/rustle.git   # Clone Rustle
 cd rustle                                       # Enter the Rustle dir
 cargo build                                     # Build the Rustle binary
 ```
-|                                                   | Using the generated binary             | Using cargo             |
-|---------------------------------------------------|----------------------------------------|-------------------------|
-|To play using the NYT's Wordle solution of the day | `.target/release/rustle`               | `cargo run`             |
-|To play using a random "offline" Wordle solution   | `./target/release/rustle --offline`    | `cargo run -- --offline`|
+
+To play using...
+|                                        | Using the generated binary             | Using cargo             |
+|----------------------------------------|----------------------------------------|-------------------------|
+|...the NYT's Wordle solution of the day | `.target/release/rustle`               | `cargo run`             |
+|...a random "offline" Wordle solution   | `./target/release/rustle --offline`    | `cargo run -- --offline`|
 
 
 ## How to Play
