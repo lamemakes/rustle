@@ -19,10 +19,10 @@ cargo build                                     # Build the Rustle binary
 ```
 
 To play using...
-|                                        | Using the generated binary             | Using cargo             |
-|----------------------------------------|----------------------------------------|-------------------------|
-|...the NYT's Wordle solution of the day | `.target/release/rustle`               | `cargo run`             |
-|...a random "offline" Wordle solution   | `./target/release/rustle --offline`    | `cargo run -- --offline`|
+|                                 | Using the generated binary             | Using cargo             |
+|---------------------------------|----------------------------------------|-------------------------|
+|...the NYT's solution of the day | `.target/release/rustle`               | `cargo run`             |
+|...a random "offline" solution   | `./target/release/rustle --offline`    | `cargo run -- --offline`|
 
 
 ## How to Play
