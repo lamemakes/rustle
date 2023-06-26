@@ -1,7 +1,7 @@
 use chrono::Datelike;
 use serde::Deserialize;
 use rand::seq::SliceRandom;
-use crate::TermFormatter;
+use crate::display::TermFormatter;
 
 #[derive(Deserialize)]
 struct SolutionResponse {
@@ -85,7 +85,7 @@ impl WordleWords {
     fn get_wordlist() -> Vec<String> {
         let raw_wordlist = include_str!("assets/wordlist.json");
 
-        let wordlist: WordList = serde_json::from_str(raw_wordlist).unwrap();
+        let wordlist: WordList = serde_json::from_str(raw_wordlist).expect("Failed to parse the specified wordlist!");
 
         wordlist.wordlist
     }

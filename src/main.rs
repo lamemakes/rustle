@@ -1,35 +1,9 @@
 use std::{io, str, env};
 use lazy_static::lazy_static;
 use regex::Regex;
-
-mod display;
-use display::{TermFormatter, RustleDisplay};
-
-mod words;
-use words::WordleWords;
-
-pub enum LetterState {
-    Exists,
-    NotExists,
-    Correct,
-    Incorrect
-}
-
-pub struct Letter {
-    value: char,
-    status: LetterState
-}
-
-impl Letter {
-    pub fn get_ansi_color(&self) -> String{
-        match self.status {
-            LetterState::Correct => TermFormatter::GreenBg.as_str(),
-            LetterState::Exists => TermFormatter::YellowBg.as_str(),
-            LetterState::Incorrect => TermFormatter::GrayBg.as_str(),
-            LetterState::NotExists => TermFormatter::WhiteBg.as_str()
-        }
-    }
-}
+use rustle::display::{TermFormatter, RustleDisplay};
+use rustle::words::WordleWords;
+use rustle::{Letter, LetterState};
 
 fn get_user_guess(display_man: &mut RustleDisplay, wordle_words: &WordleWords) -> String {
     const WORD_GUESS_PROMPT: &str = "Enter a word guess:";
@@ -67,13 +41,16 @@ fn process_guess(user_guess: &str, guess_list: &mut [Vec<Letter>; 6], solution: 
 
 
     for (index, char) in user_guess_chars.iter().enumerate() {
+        let status: LetterState;
         if char == &solution_chars[index] {
-            current_guess.push(Letter { value: *char, status: LetterState::Correct })
+            status = LetterState::Correct;
         } else if solution_chars.contains(char) {
-            current_guess.push(Letter { value: *char, status: LetterState::Exists })
+            status = LetterState::Exists;
         } else {
-            current_guess.push(Letter { value: *char, status: LetterState::Incorrect })
+            status = LetterState::Incorrect;
         }
+
+        current_guess.push(Letter::new(*char, status))
     }
 
     guess_list[usize::from(attempt)-1] = current_guess;
@@ -90,38 +67,54 @@ fn main() {
     const MAX_TRIES: u8 = 6;
 
     let mut guess_list: [Vec<Letter>; 6] = [
-        vec![Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }], 
-        vec![Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }],
-        vec![Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }],
-        vec![Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }],
-        vec![Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }],
-        vec![Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }, Letter { value: ' ', status: LetterState::NotExists }]
+        vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)], 
+        vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)],
+        vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)],
+        vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)],
+        vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)],
+        vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)]
     ];
 
     let mut rustle_display = RustleDisplay::initialize_ui(wordle_words.offline);
-    rustle_display.draw_logo();
+    match rustle_display.draw_logo() {
+        Err(e) => panic!("Failed to draw logo: {}", e.to_string()),
+        Ok(_) => {}
+    }
 
-    rustle_display.draw_ui(&guess_list);
+    match rustle_display.draw_ui(&guess_list) {
+        Err(e) => panic!("Failed to draw logo: {}", e.to_string()),
+        Ok(_) => {}
+    }
 
     let mut guess = get_user_guess(&mut rustle_display, &wordle_words);
 
     for attempt in 1..=MAX_TRIES {
         process_guess(&guess, &mut guess_list, wordle_solution, attempt);
-        rustle_display.draw_ui(&guess_list);
+        match rustle_display.draw_ui(&guess_list) {
+            Err(e) => panic!("Failed to draw logo: {}", e.to_string()),
+            Ok(_) => {}
+        }
 
         if guess == wordle_solution {
-            println!("{}WINNER!{} Word was \"{}{}{}\"", 
-            TermFormatter::GreenBold.as_str(),
-            TermFormatter::Clear.as_str(),
-            TermFormatter::DefaultBold.as_str(),
-            wordle_solution.to_uppercase(),
-            TermFormatter::Clear.as_str()
-            
-        );
+            println!(
+                "{}WINNER!{} Word was \"{}{}{}\"", 
+                TermFormatter::GreenBold.as_str(),
+                TermFormatter::Clear.as_str(),
+                TermFormatter::DefaultBold.as_str(),
+                wordle_solution.to_uppercase(),
+                TermFormatter::Clear.as_str()
+            );
+
             rustle_display.terminate_ui();
             return
         } else if attempt == MAX_TRIES {
-            println!("Failed to guess in {} tries! Word was \"{}\"", MAX_TRIES, wordle_solution);
+            println!(
+                "Failed to guess in {} tries! Word was \"{}{}{}\"",
+                MAX_TRIES,
+                TermFormatter::DefaultBold.as_str(),
+                wordle_solution.to_uppercase(),
+                TermFormatter::Clear.as_str()
+            );
             rustle_display.terminate_ui();
             return
         } else {
@@ -131,3 +124,44 @@ fn main() {
 
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_populates_guess_list() {
+        let user_guess = "nouns";
+
+        let mut guess_list: [Vec<Letter>; 6] = [
+            vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)], 
+            vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)],
+            vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)],
+            vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)],
+            vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)],
+            vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)]
+        ];
+
+        let solution = "snaps";
+        let solution_chars: Vec<char> = solution.chars().collect();
+        let attempt = 3;
+        
+        process_guess(user_guess, &mut guess_list, solution, attempt);
+
+        for (letter, char) in guess_list[usize::from(attempt) - 1].iter().zip(user_guess.chars()) {
+            assert_eq!(letter.value(), char);
+        }
+
+        for (letter, char) in guess_list[usize::from(attempt) - 1].iter().zip(solution.chars()) {
+            let status: LetterState;
+            if letter.value() == char {
+                status = LetterState::Correct;
+            } else if solution_chars.contains(&letter.value()) {
+                status = LetterState::Exists;
+            } else {
+                status = LetterState::Incorrect;
+            }
+
+            assert_eq!(letter.status(), &status);
+        }
+    }
+}

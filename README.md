@@ -15,18 +15,12 @@ The following tutorial shows you how to build Rustle:
 ```
 git clone git@github.com:lamemakes/rustle.git   # Clone Rustle
 cd rustle                                       # Enter the Rustle dir
-cargo build                                     # Build Rustle
+cargo build                                     # Build the Rustle binary
 ```
-
-To play using the NYT's Wordle solution of the day:
-```
-./target/release/rustle                         # Run "online" Rustle
-```
-
-or, for a random "offline" Wordle solution:
-```
-./target/release/rustle --offline
-```
+|                                                   | Using the generated binary             | Using cargo             |
+|---------------------------------------------------|----------------------------------------|-------------------------|
+|To play using the NYT's Wordle solution of the day | `.target/release/rustle`               | `cargo run`             |
+|To play using a random "offline" Wordle solution   | `./target/release/rustle --offline`    | `cargo run -- --offline`|
 
 
 ## How to Play

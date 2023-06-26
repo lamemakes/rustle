@@ -102,48 +102,52 @@ impl RustleDisplay {
 
         let mut stdout: io::Stdout = io::stdout();
 
-        stdout.queue(cursor::SavePosition).unwrap();
+        stdout.queue(cursor::SavePosition).expect("Failed to save cursor position");
 
         const GAME_HEIGHT: u8 = 6 * 2 + 2;  // The size of the guess_list array with a space after each item, with two lines for prompts & inputs.
 
         let overall_height = usize::from(GAME_HEIGHT) + Logo::get_logo(offline).lines().count();
 
         for _ in 1..=(overall_height) {
-            stdout.write_all(format!("\n").as_bytes()).unwrap();
+            stdout.write_all(format!("\n").as_bytes()).expect("Failed to write buffer to STDOUT");
         }
     
         RustleDisplay { 
             stdout: stdout,
-            overall_height: u8::try_from(overall_height).expect("Failed to convert logo line length to u8!"),
+            overall_height: u8::try_from(overall_height).expect("Failed to convert logo line length to u8"),
             overall_width: 58,
             game_height: 6 * 2 + 2,
             offline: offline
         }
     }
 
-    pub fn draw_logo(&mut self) {
-        self.stdout.queue(cursor::MoveUp(u16::from(self.overall_height))).unwrap();
-        self.stdout.write_all(format!("{}{}{}", TermFormatter::DefaultBold.as_str(), Logo::get_logo(self.offline), TermFormatter::Clear.as_str()).as_bytes()).unwrap();
-        self.stdout.queue(cursor::MoveDown(u16::from(self.game_height))).unwrap();
-        self.stdout.flush().unwrap();
+    pub fn draw_logo(&mut self) -> io::Result<()> {
+        self.stdout.queue(cursor::MoveUp(u16::from(self.overall_height)))?;
+        self.stdout.write_all(format!("{}{}{}", TermFormatter::DefaultBold.as_str(), Logo::get_logo(self.offline), TermFormatter::Clear.as_str()).as_bytes())?;
+        self.stdout.queue(cursor::MoveDown(u16::from(self.game_height)))?;
+        self.stdout.flush()?;
+
+        Ok(())
     }
 
-    pub fn draw_ui(&mut self, guess_list: &[Vec<Letter>; 6]) {
-        self.stdout.queue(cursor::MoveUp(u16::from(self.game_height))).unwrap();
-        self.stdout.queue(terminal::Clear(terminal::ClearType::FromCursorDown)).unwrap();
+    pub fn draw_ui(&mut self, guess_list: &[Vec<Letter>; 6]) -> io::Result<()> {
+        self.stdout.queue(cursor::MoveUp(u16::from(self.game_height)))?;
+        self.stdout.queue(terminal::Clear(terminal::ClearType::FromCursorDown))?;
     
         for guess in guess_list {
             for _ in 1..=((self.overall_width - 20)/2) {
-                self.stdout.write_all(" ".as_bytes()).unwrap();
+                self.stdout.write_all(" ".as_bytes())?;
             }
             for letter in guess {
-                self.stdout.write_all(format!("{}{} {} {} ", TermFormatter::BlackBold.as_str(), letter.get_ansi_color(), letter.value, TermFormatter::Clear.as_str()).as_bytes()).unwrap();
+                self.stdout.write_all(format!("{}{} {} {} ", TermFormatter::BlackBold.as_str(), letter.get_ansi_color(), letter.value, TermFormatter::Clear.as_str()).as_bytes())?;
             }
-            self.stdout.write_all("\n\n".as_bytes()).unwrap();
+            self.stdout.write_all("\n\n".as_bytes())?;
         }
-        self.stdout.flush().unwrap();
+        self.stdout.flush()?;
     
-        self.stdout.execute(cursor::Show).unwrap();
+        self.stdout.execute(cursor::Show)?;
+
+        Ok(())
  
     }
 
