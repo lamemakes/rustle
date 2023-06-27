@@ -38,3 +38,6 @@ impl Letter {
         }
     }
 }
+
+#[cfg(test)]
+mod lib_tests;

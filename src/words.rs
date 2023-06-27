@@ -20,7 +20,7 @@ pub struct WordleWords {
 }
 
 impl WordleWords {
-    pub fn initialize(offline: bool) -> WordleWords {
+    pub fn new(offline: bool) -> WordleWords {
         let mut offline = offline;
         let wordlist = WordleWords::get_wordlist();
 

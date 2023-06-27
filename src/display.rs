@@ -97,28 +97,30 @@ pub struct RustleDisplay {
 }
 
 impl RustleDisplay {
-    pub fn initialize_ui(offline: bool) -> RustleDisplay {
+    pub fn initialize_ui(offline: bool) -> Result<RustleDisplay, Box<dyn std::error::Error>> {
         // Initialize a "canvas" that accounts for the size of the logo, input fields, and actual game UI.
 
         let mut stdout: io::Stdout = io::stdout();
 
-        stdout.queue(cursor::SavePosition).expect("Failed to save cursor position");
+        stdout.queue(cursor::SavePosition)?;
 
         const GAME_HEIGHT: u8 = 6 * 2 + 2;  // The size of the guess_list array with a space after each item, with two lines for prompts & inputs.
 
         let overall_height = usize::from(GAME_HEIGHT) + Logo::get_logo(offline).lines().count();
 
         for _ in 1..=(overall_height) {
-            stdout.write_all(format!("\n").as_bytes()).expect("Failed to write buffer to STDOUT");
+            stdout.write_all(format!("\n").as_bytes())?;
         }
+
+        let overall_height = u8::try_from(overall_height)?;
     
-        RustleDisplay { 
+        Ok(RustleDisplay { 
             stdout: stdout,
-            overall_height: u8::try_from(overall_height).expect("Failed to convert logo line length to u8"),
+            overall_height: overall_height,
             overall_width: 58,
             game_height: 6 * 2 + 2,
             offline: offline
-        }
+        })
     }
 
     pub fn draw_logo(&mut self) -> io::Result<()> {
@@ -151,18 +153,22 @@ impl RustleDisplay {
  
     }
 
-    pub fn draw_input_error(&mut self, error_msg: &str) {
-        self.stdout.queue(cursor::MoveUp(cursor::position().expect("Failed to get cursor position").0 + 2)).unwrap();
-        self.stdout.queue(terminal::Clear(terminal::ClearType::FromCursorDown)).unwrap();
-        self.stdout.write_all(format!("{}{}{}", TermFormatter::RedFg.as_str(), error_msg, TermFormatter::Clear.as_str()).as_bytes()).unwrap();
-        self.stdout.flush().unwrap();
+    pub fn draw_input_error(&mut self, error_msg: &str) -> io::Result<()> {
+        self.stdout.queue(cursor::MoveUp(cursor::position().expect("Failed to get cursor position").0 + 2))?;
+        self.stdout.queue(terminal::Clear(terminal::ClearType::FromCursorDown))?;
+        self.stdout.write_all(format!("{}{}{}", TermFormatter::RedFg.as_str(), error_msg, TermFormatter::Clear.as_str()).as_bytes())?;
+        self.stdout.flush()?;
+
+        Ok(())
     }
 
-    pub fn terminate_ui(&mut self) {
-        self.stdout.queue(cursor::MoveUp(u16::from(self.overall_height))).unwrap();
+    pub fn terminate_ui(&mut self) -> io::Result<()> {
+        self.stdout.queue(cursor::MoveUp(u16::from(self.overall_height)))?;
         for _ in 1..=(self.overall_height) {
-            self.stdout.write_all(format!("\n").as_bytes()).unwrap();
+            self.stdout.write_all(format!("\n").as_bytes())?;
         }
-        self.stdout.queue(cursor::RestorePosition).unwrap();
+        self.stdout.queue(cursor::RestorePosition)?;
+
+        Ok(())
     }
 }

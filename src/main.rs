@@ -11,21 +11,24 @@ fn get_user_guess(display_man: &mut RustleDisplay, wordle_words: &WordleWords) -
     let mut guess = String::new();
 
     println!("{}", WORD_GUESS_PROMPT);
-    io::stdin().read_line(&mut guess).expect("Failed to read line!");
+    io::stdin().read_line(&mut guess).expect("Failed to read STDIN line");
 
     guess = guess.trim().to_string();
 
     lazy_static! {
-        static ref RE: Regex = Regex::new("^[a-zA-Z]{5}$").unwrap();
+        static ref RE: Regex = Regex::new("^[a-zA-Z]{5}$").expect("Faied to create RegEx");
     }
 
     while !RE.is_match(&guess) || !wordle_words.wordlist.contains(&String::from(&guess)) {
 
-        display_man.draw_input_error(format!("Invalid word \"{}\"! Please enter a new guess:\n", &guess).as_str());
+        match display_man.draw_input_error(format!("Invalid word \"{}\"! Please enter a new guess:\n", &guess).as_str()) {
+            Err(e) => panic!("Failed to draw error: {}", e.to_string()),
+            Ok(_) => {}
+        }
 
         guess.clear();
 
-        io::stdin().read_line(&mut guess).expect("Failed to read line!");
+        io::stdin().read_line(&mut guess).expect("Failed to read STDIN line");
         guess = guess.trim().to_string();
     }
 
@@ -60,7 +63,7 @@ fn main() {
     println!();
 
     let args: Vec<String> = env::args().collect();
-    let wordle_words = WordleWords::initialize(args.len() > 1 && args[1] == "--offline");
+    let wordle_words = WordleWords::new(args.len() > 1 && args[1] == "--offline");
 
     let wordle_solution: &str = &wordle_words.solution.to_owned();
 
@@ -75,7 +78,11 @@ fn main() {
         vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)]
     ];
 
-    let mut rustle_display = RustleDisplay::initialize_ui(wordle_words.offline);
+    let mut rustle_display = match RustleDisplay::initialize_ui(wordle_words.offline) {
+        Ok(res) => res,
+        Err(e) => panic!("Failed to initialize display: {}", e.to_string())
+    };
+
     match rustle_display.draw_logo() {
         Err(e) => panic!("Failed to draw logo: {}", e.to_string()),
         Ok(_) => {}
@@ -90,6 +97,7 @@ fn main() {
 
     for attempt in 1..=MAX_TRIES {
         process_guess(&guess, &mut guess_list, wordle_solution, attempt);
+
         match rustle_display.draw_ui(&guess_list) {
             Err(e) => panic!("Failed to draw logo: {}", e.to_string()),
             Ok(_) => {}
@@ -105,7 +113,11 @@ fn main() {
                 TermFormatter::Clear.as_str()
             );
 
-            rustle_display.terminate_ui();
+            match rustle_display.terminate_ui(){
+                Err(e) => panic!("Failed to terminate display: {}", e.to_string()),
+                Ok(_) => {}
+            };
+
             return
         } else if attempt == MAX_TRIES {
             println!(
@@ -115,7 +127,11 @@ fn main() {
                 wordle_solution.to_uppercase(),
                 TermFormatter::Clear.as_str()
             );
-            rustle_display.terminate_ui();
+
+            match rustle_display.terminate_ui(){
+                Err(e) => panic!("Failed to terminate display: {}", e.to_string()),
+                Ok(_) => {}
+            };
             return
         } else {
             guess = get_user_guess(&mut rustle_display, &wordle_words);
@@ -125,43 +141,4 @@ fn main() {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_populates_guess_list() {
-        let user_guess = "nouns";
-
-        let mut guess_list: [Vec<Letter>; 6] = [
-            vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)], 
-            vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)],
-            vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)],
-            vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)],
-            vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)],
-            vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)]
-        ];
-
-        let solution = "snaps";
-        let solution_chars: Vec<char> = solution.chars().collect();
-        let attempt = 3;
-        
-        process_guess(user_guess, &mut guess_list, solution, attempt);
-
-        for (letter, char) in guess_list[usize::from(attempt) - 1].iter().zip(user_guess.chars()) {
-            assert_eq!(letter.value(), char);
-        }
-
-        for (letter, char) in guess_list[usize::from(attempt) - 1].iter().zip(solution.chars()) {
-            let status: LetterState;
-            if letter.value() == char {
-                status = LetterState::Correct;
-            } else if solution_chars.contains(&letter.value()) {
-                status = LetterState::Exists;
-            } else {
-                status = LetterState::Incorrect;
-            }
-
-            assert_eq!(letter.status(), &status);
-        }
-    }
-}
+mod bin_tests;
