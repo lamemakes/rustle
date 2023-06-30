@@ -1,3 +1,5 @@
+use std::error::Error;
+
 use chrono::Datelike;
 use serde::Deserialize;
 use rand::seq::SliceRandom;
@@ -20,9 +22,9 @@ pub struct WordleWords {
 }
 
 impl WordleWords {
-    pub fn new(offline: bool) -> WordleWords {
+    pub fn new(offline: bool) -> Result<WordleWords, Box<dyn Error>> {
         let mut offline = offline;
-        let wordlist = WordleWords::get_wordlist();
+        let wordlist = WordleWords::get_wordlist()?;
 
         let solution: String;
 
@@ -39,14 +41,14 @@ impl WordleWords {
                         TermFormatter::Clear.as_str()
                     );
                     offline = true;
-                    WordleWords::get_random_local_solution(&wordlist)
+                    WordleWords::get_random_local_solution(&wordlist)?
                 }
             }
         } else {
-            solution = WordleWords::get_random_local_solution(&wordlist);
+            solution = WordleWords::get_random_local_solution(&wordlist)?;
         }
 
-        WordleWords { solution: solution, wordlist: wordlist, offline: offline}
+        Ok(WordleWords { solution: solution, wordlist: wordlist, offline: offline})
     }
 
     fn get_remote_solution() -> Result<String, &'static str> {
@@ -78,15 +80,18 @@ impl WordleWords {
         }
     }
 
-    fn get_random_local_solution(wordlist: &Vec<String>) -> String {
-        wordlist.choose(&mut rand::thread_rng()).expect("Failed to randomly select a word from the wordlist!").to_owned()
+    fn get_random_local_solution(wordlist: &Vec<String>) -> Result<String, &str> {
+        match wordlist.choose(&mut rand::thread_rng()) {
+            Some(rand_solution) => Ok(rand_solution.to_owned()),
+            None => Err("Failed to retrieve a new local word")
+        }
     }
 
-    fn get_wordlist() -> Vec<String> {
+    fn get_wordlist() -> Result<Vec<String>, Box<dyn Error>> {
         let raw_wordlist = include_str!("assets/wordlist.json");
 
-        let wordlist: WordList = serde_json::from_str(raw_wordlist).expect("Failed to parse the specified wordlist!");
+        let wordlist: WordList = serde_json::from_str(raw_wordlist)?;
 
-        wordlist.wordlist
+        Ok(wordlist.wordlist)
     }
 }

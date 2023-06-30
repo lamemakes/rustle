@@ -65,7 +65,7 @@ impl Logo {
   888ooo88P'  '888  '888  d88(  \"8  '888'   888  d88' '88b 
   888`^\\888b   888   888  `\"Y88b.    888    888  888ooo888 
  .888.  `888.  888   888. o.  )88b   888.  .888. 888. .ooo 
- o888o   888o  `V88V\"V888 8\"\"888P'   8888  88888  `Y88888P'\n";
+ o888o   888o  `V88V\"V888 8\"\"888P'   8888  88888 `Y88888P'\n";
 
         if offline {
             let mut spacer = String::new();
@@ -154,7 +154,7 @@ impl RustleDisplay {
     }
 
     pub fn draw_input_error(&mut self, error_msg: &str) -> io::Result<()> {
-        self.stdout.queue(cursor::MoveUp(cursor::position().expect("Failed to get cursor position").0 + 2))?;
+        self.stdout.queue(cursor::MoveUp(cursor::position()?.0 + 2))?;
         self.stdout.queue(terminal::Clear(terminal::ClearType::FromCursorDown))?;
         self.stdout.write_all(format!("{}{}{}", TermFormatter::RedFg.as_str(), error_msg, TermFormatter::Clear.as_str()).as_bytes())?;
         self.stdout.flush()?;
