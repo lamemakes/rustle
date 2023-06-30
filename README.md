@@ -1,6 +1,11 @@
 <p align="center">
     <img src="docs/images/rustle_logo.png" alt="Rustle Logo" width="350px"/>
 </p>
+<p align="center">
+  <a href="https://github.com/lamemakes/rustle/actions/workflows/ci.yml">
+    <img src="https://github.com/lamemakes/rustle/actions/workflows/ci.yml/badge.svg" alt="Rustle CI" />
+  </a>
+</p>
 <p align="center">An open source Wordle CLI built in Rust</p>
 
 ## What is Rustle?

@@ -1,4 +1,4 @@
-name: Rustle build & test
+name: CI
 
 on:
   push:
