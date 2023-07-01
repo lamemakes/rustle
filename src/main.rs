@@ -64,7 +64,7 @@ fn main() {
         panic!("Failed to draw logo: {}", err.to_string())
     });
 
-    let mut guess = get_user_guess(&stdin, &mut rustle_display, &wordle_words).unwrap_or_else(|err| {
+    let mut guess = get_user_guess(&mut stdin.lock(), &mut rustle_display, &wordle_words).unwrap_or_else(|err| {
         panic!("Failed to draw logo: {}", err.to_string())
     });
 
@@ -105,7 +105,7 @@ fn main() {
 
             return
         } else {
-            guess = get_user_guess(&stdin, &mut rustle_display, &wordle_words).unwrap_or_else(|err| {
+            guess = get_user_guess(&mut stdin.lock(), &mut rustle_display, &wordle_words).unwrap_or_else(|err| {
                 panic!("Failed to draw logo: {}", err.to_string())
             });
         }

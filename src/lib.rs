@@ -1,8 +1,7 @@
 pub mod display;
 pub mod words;
 
-use std::error::Error;
-use std::io;
+use std::{error::Error, io::BufRead};
 use lazy_static::lazy_static;
 use regex::Regex;
 
@@ -44,7 +43,10 @@ impl Letter {
     }
 }
 
-pub fn get_user_guess(stdin: &io::Stdin, display_man: &mut RustleDisplay, wordle_words: &words::WordleWords) -> Result<String, Box<dyn Error>> {
+pub fn get_user_guess<R>(stdin: &mut R, display_man: &mut RustleDisplay, wordle_words: &words::WordleWords) -> Result<String, Box<dyn Error>>
+    where
+        R: BufRead
+    {
     const WORD_GUESS_PROMPT: &str = "Enter a word guess:";
 
     let mut guess = String::new();
@@ -64,7 +66,7 @@ pub fn get_user_guess(stdin: &io::Stdin, display_man: &mut RustleDisplay, wordle
 
         guess.clear();
 
-        io::stdin().read_line(&mut guess)?;
+        stdin.read_line(&mut guess)?;
         guess = guess.trim().to_string();
     }
 
