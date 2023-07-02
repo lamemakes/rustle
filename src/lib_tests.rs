@@ -75,6 +75,8 @@ fn create_offline_solution() -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
+// TODO: Online word solution tests! Mock reqwest!
+
 #[test]
 fn process_guess_list_population() {
     let user_guess = "nouns";

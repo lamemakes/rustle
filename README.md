@@ -29,6 +29,7 @@ To play using...
 |...the NYT's solution of the day | `.target/release/rustle`               | `cargo run`             |
 |...a random "offline" solution   | `./target/release/rustle --offline`    | `cargo run -- --offline`|
 
+**NOTE:** If unavailable to connect to the NYT's API, rustle will default to offline mode.
 
 ## How to Play
 
