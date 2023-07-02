@@ -1,31 +1,7 @@
 use std::{str, env, process, io};
 use rustle::display::{TermFormatter, RustleDisplay};
 use rustle::words::WordleWords;
-use rustle::{Letter, LetterState, get_user_guess};
-
-fn process_guess(user_guess: &str, guess_list: &mut [Vec<Letter>; 6], solution: &str, attempt: u8) {
-
-    let user_guess_chars: Vec<char> = user_guess.chars().collect();
-    let solution_chars: Vec<char> = solution.chars().collect();
-
-    let mut current_guess: Vec<Letter> = Vec::new();
-
-
-    for (index, char) in user_guess_chars.iter().enumerate() {
-        let status: LetterState;
-        if char == &solution_chars[index] {
-            status = LetterState::Correct;
-        } else if solution_chars.contains(char) {
-            status = LetterState::Exists;
-        } else {
-            status = LetterState::Incorrect;
-        }
-
-        current_guess.push(Letter::new(*char, status))
-    }
-
-    guess_list[usize::from(attempt)-1] = current_guess;
-}
+use rustle::{Letter, LetterState, get_user_guess, process_guess};
 
 fn main() {
     println!();
