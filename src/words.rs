@@ -16,15 +16,15 @@ struct WordList {
 }
 
 pub struct WordleWords {
-    pub solution: String,
-    pub wordlist: Vec<String>,
-    pub offline: bool
+    solution: String,
+    wordlist: Vec<String>,
+    offline: bool
 }
 
 impl WordleWords {
     pub fn new(offline: bool) -> Result<WordleWords, Box<dyn Error>> {
         let mut offline = offline;
-        let wordlist = WordleWords::get_wordlist()?;
+        let wordlist = WordleWords::load_wordlist()?;
 
         let solution: String;
 
@@ -87,11 +87,24 @@ impl WordleWords {
         }
     }
 
-    fn get_wordlist() -> Result<Vec<String>, Box<dyn Error>> {
+    fn load_wordlist() -> Result<Vec<String>, Box<dyn Error>> {
         let raw_wordlist = include_str!("assets/wordlist.json");
 
         let wordlist: WordList = serde_json::from_str(raw_wordlist)?;
 
         Ok(wordlist.wordlist)
     }
+
+    pub fn is_offline(&self) -> bool {
+        return self.offline
+    }
+
+    pub fn get_solution(&self) -> &String {
+        return &self.solution
+    }
+
+    pub fn get_wordlist(&self) -> &Vec<String> {
+        return &self.wordlist
+    }
+
 }

@@ -57,7 +57,7 @@ fn create_offline_wordlist() -> Result<(), Box<dyn Error>> {
     let test_word_list = TestWordList::new()?;
 
     let test_hash: HashSet<String> = test_word_list.wordlist.into_iter().collect();
-    let wordle_words_hash: HashSet<String> = wordle_words.wordlist.into_iter().collect();
+    let wordle_words_hash: HashSet<String> = wordle_words.get_wordlist().clone().into_iter().collect();
     let sym_diff: Vec<&String> = test_hash.symmetric_difference(&wordle_words_hash).collect();
 
     assert_eq!(sym_diff.len(), 0);
@@ -70,7 +70,7 @@ fn create_offline_solution() -> Result<(), Box<dyn Error>> {
     let wordle_words = words::WordleWords::new(false)?;
     let test_word_list = TestWordList::new()?;
 
-    assert!(test_word_list.wordlist.contains(&String::from(wordle_words.solution)));
+    assert!(test_word_list.wordlist.contains(&String::from(wordle_words.get_solution())));
 
     Ok(())
 }

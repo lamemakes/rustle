@@ -12,7 +12,7 @@ fn main() {
         process::exit(1)
     });
 
-    let wordle_solution: &str = &wordle_words.solution.to_owned();
+    let wordle_solution: &str = &wordle_words.get_solution().clone();
 
     let stdin = io::stdin();
 
@@ -27,7 +27,7 @@ fn main() {
         vec![Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists), Letter::new(' ', LetterState::NotExists)]
     ];
 
-    let mut rustle_display = match RustleDisplay::initialize_ui(wordle_words.offline) {
+    let mut rustle_display = match RustleDisplay::initialize_ui(wordle_words.is_offline()) {
         Ok(res) => res,
         Err(e) => panic!("Failed to initialize display: {}", e.to_string())
     };

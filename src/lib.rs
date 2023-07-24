@@ -60,7 +60,7 @@ pub fn get_user_guess<R>(stdin: &mut R, display_man: &mut RustleDisplay, wordle_
         static ref RE: Regex = Regex::new("^[a-zA-Z]{5}$").expect("Faied to create RegEx");
     }
 
-    while !RE.is_match(&guess) || !wordle_words.wordlist.contains(&String::from(&guess)) {
+    while !RE.is_match(&guess) || !wordle_words.get_wordlist().contains(&String::from(&guess)) {
 
         display_man.draw_input_error(format!("Invalid word \"{}\"! Please enter a new guess:\n", &guess).as_str())?;
 
