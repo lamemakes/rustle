@@ -8,6 +8,8 @@
 </p>
 <p align="center">An open source Wordle CLI built in Rust</p>
 
+**⚠️ NOTE: This project will now live at it's Codeberg repo, [check it out!](https://codeberg.org/lamemakes/rustle) ⚠️**
+
 ## What is Rustle?
  
 Rustle allows you to play the daily Wordle ad-free and from the comfort of your favorite Command Line Interface (CLI) - Unix or Windows!
